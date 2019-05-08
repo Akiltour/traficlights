@@ -1,3 +1,5 @@
-# traficlights
-rapport embedded : https://www.overleaf.com/4439794668syknfxjtrqjf
-rapport formal : https://www.overleaf.com/8665413969tkbbbrpxmwwj
+# Traffic Light
+
+Embedded System Report : https://www.overleaf.com/4439794668syknfxjtrqjf
+
+Formal verification Report : https://www.overleaf.com/8665413969tkbbbrpxmwwj
