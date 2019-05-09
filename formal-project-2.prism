@@ -1,0 +1,23 @@
+dtmc
+
+module queue
+	s : [0..1]  init 0;
+	x : [0..10] init 0;
+	y : [0..10] init 0;
+	t : [0..10] init 0;
+
+	[] s=0 & t=10 -> (s'=1)&(t'=0);
+
+	[] s=0 & t<=9 ->  0.24 : (t'= t+1) //x arrive
+			+ 0.14 : (x'=max(x-1,0))  & (y'=min(y+1,10)) & (t'= t+1)//y arrive
+			+ 0.06 : (y'=min(y+1,10)) & (t'=t+1) //y et x arrivent
+			+ 0.56 : (x'=max(x-1,0))  & (t'=t+1); //personne n'arrive
+
+	[] s=1 & t=10 -> (s'=0)&(t'=0); 
+
+	[] s=1 & t<=9 ->  0.14 : (t'= t+1) //y arrive
+			+ 0.24 : (x'=min(x+1,10)) & (y'=max(y-1,0)) & (t'= t+1)//x arrive
+			+ 0.06 : (x'=min(x+1,10)) & (t'=t+1) //y et x arrivent
+			+ 0.56 : (y'=max(y-1,0))  & (t'=t+1); //personne n'arrive
+
+endmodule
