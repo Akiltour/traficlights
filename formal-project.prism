@@ -1,25 +1,35 @@
 mdp
 
+const int timemax=150;
+const int endx;
+const int endy;
+//proba x=0.4
+//proba y=0.3
+
 module model
-	s : [0..1]  init 0;
-	x : [0..10] init 0;
-	y : [0..10] init 0;
-	t : [0..500] init 0;
+	s : [0..2]  init 1;
+	x : [0..maxtime] init 0;
+	y : [0..maxtime] init 0;
+	t : [0..maxtime] init 0;
 
-	[change] s=0 -> (s'=1)&(t'=0);
+	[change] s=0 & mod(t,endx)=0 -> (s'=1)&(t'=t+1);
 
-	[stayx]  s=0 & t<500 ->  0.24 : (t'= t+1) //x arrive
-		 + 0.14 : (x'=max(x-1,0))  & (y'=min(y+1,10)) & (t'= t+1)//y arrive
-		 + 0.06 : (y'=min(y+1,10)) & (t'=t+1) //y et x arrivent
-		 + 0.56 : (x'=max(x-1,0))  & (t'=t+1); //personne n'arrive
+	[stayx]  s=0 & t<maxtime & mod(t,endx)!=0 ->  0.28 : (t'= t+1) //x arrive
+		 + 0.18 : (x'=max(x-1,0))  & (y'=min(y+1,maxtime)) & (t'= t+1)//y arrive
+		 + 0.12 : (y'=min(y+1,maxtime)) & (t'=t+1) //y et x arrivent
+		 + 0.42 : (x'=max(x-1,0))  & (t'=t+1); //personne n'arrive
 
-	[change] s=1 -> (s'=0)&(t'=0); 
+	[change] s=1 & mod(t,endy)=0 -> (s'=0)&(t'=t+1); 
 
-	[stayy]  s=1 & t<500 ->  0.14 : (t'= t+1) //y arrive
-		 + 0.24 : (x'=min(x+1,10)) & (y'=max(y-1,0)) & (t'= t+1)//x arrive
-		 + 0.06 : (x'=min(x+1,10)) & (t'=t+1) //y et x arrivent
-		 + 0.56 : (y'=max(y-1,0))  & (t'=t+1); //personne n'arrive
+	[stayy]  s=1 & t<maxtime & mod(t,endy)!=0 ->  0.28 : (t'= t+1) //y arrive
+		 + 0.18 : (x'=min(x+1,maxtime)) & (y'=max(y-1,0)) & (t'= t+1)//x arrive
+		 + 0.12 : (x'=min(x+1,maxtime)) & (t'=t+1) //y et x arrivent
+		 + 0.42 : (y'=max(y-1,0))  & (t'=t+1); //personne n'arrive
+
+	[] t=maxtime -> (s'=2);
 endmodule
+
+label "end" = t=maxtime;
 
 rewards "total_out"
 	[stayx] x>0 : 1;
