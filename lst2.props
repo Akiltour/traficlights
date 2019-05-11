@@ -1,5 +1,16 @@
-P=? [F<200 x>5] 
+Pmin=? [ F<500 x>5 ]
 
-P=? [F<200 y>5]
+Pmax=? [ F<500 x>5 ]
 
-P>0 [F s=1 & s=0]
+Pmax=? [ F<500 y>5 ]
+
+Pmin=? [ F<500 y>5 ]
+
+R{"total_out"}min=?[C<=500]
+
+R{"total_out"}max=?[C<=500]
+
+R{"total_waiting_time"}max=?[C<=500]
+
+R{"total_waiting_time"}min=?[C<=500]
+
