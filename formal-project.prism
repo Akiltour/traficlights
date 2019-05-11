@@ -1,6 +1,6 @@
 mdp
 
-const int timemax=150;
+const int maxtime=150;
 const int endx;
 const int endy;
 //proba x=0.4
