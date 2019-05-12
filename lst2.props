@@ -1,6 +1,6 @@
-R{"total_out"}max=?[F "end"]
+R{"total_out"}max=? [ F "end" ]
 
-R{"total_waiting_time"}min=?[F "end"]
+R{"total_waiting_time"}min=? [ F "end" ]
 
 Pmin=? [ F<500 x>5 ]
 
@@ -10,6 +10,3 @@ Pmax=? [ F<500 y>5 ]
 
 Pmin=? [ F<500 y>5 ]
 
-R{"total_waiting_time"}max=?[F "end"]
-
-R{"total_out"}min=?[F "end"]

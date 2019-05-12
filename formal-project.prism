@@ -4,7 +4,7 @@ const int maxtime=150;
 const int endx;
 const int endy;
 //proba x=0.4
-//proba y=0.3
+//proba y=0.2
 
 module model
 	s : [0..2]  init 1;
@@ -14,17 +14,17 @@ module model
 
 	[change] s=0 & mod(t,endx)=0 & t<maxtime-> (s'=1)&(t'=t+1);
 
-	[stayx]  s=0 & t<maxtime & mod(t,endx)!=0 ->  0.28 : (t'= t+1) //x arrive
-		 + 0.18 : (x'=max(x-1,0))  & (y'=min(y+1,maxtime)) & (t'= t+1)//y arrive
-		 + 0.12 : (y'=min(y+1,maxtime)) & (t'=t+1) //y et x arrivent
-		 + 0.42 : (x'=max(x-1,0))  & (t'=t+1); //personne n'arrive
+	[stayx]  s=0 & t<maxtime & mod(t,endx)!=0 ->  0.32 : (t'= t+1) //x arrive
+		 + 0.12 : (x'=max(x-1,0))  & (y'=min(y+1,maxtime)) & (t'= t+1)//y arrive
+		 + 0.08 : (y'=min(y+1,maxtime)) & (t'=t+1) //y et x arrivent
+		 + 0.48 : (x'=max(x-1,0))  & (t'=t+1); //personne n'arrive
 
 	[change] s=1 & mod(t,endy)=0 & t<maxtime -> (s'=0)&(t'=t+1); 
 
-	[stayy]  s=1 & t<maxtime & mod(t,endy)!=0 ->  0.28 : (t'= t+1) //y arrive
-		 + 0.18 : (x'=min(x+1,maxtime)) & (y'=max(y-1,0)) & (t'= t+1)//x arrive
-		 + 0.12 : (x'=min(x+1,maxtime)) & (t'=t+1) //y et x arrivent
-		 + 0.42 : (y'=max(y-1,0))  & (t'=t+1); //personne n'arrive
+	[stayy]  s=1 & t<maxtime & mod(t,endy)!=0 ->  0.32 : (t'= t+1) //y arrive
+		 + 0.12 : (x'=min(x+1,maxtime)) & (y'=max(y-1,0)) & (t'= t+1)//x arrive
+		 + 0.08 : (x'=min(x+1,maxtime)) & (t'=t+1) //y et x arrivent
+		 + 0.48 : (y'=max(y-1,0))  & (t'=t+1); //personne n'arrive
 
 	[] t=maxtime -> (s'=2);
 endmodule
