@@ -1,8 +1,12 @@
-mdp
+smg
 
-const int maxtime=150;
+const int maxtime=50;
 //proba x=0.4
 //proba y=0.2
+
+player p 
+	model,[change],[stayx],[stayy]
+endplayer
 
 module model
 	s : [0..2]  init 1;
