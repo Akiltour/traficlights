@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<style>
+  html{
+    background-color: black;
+    color:white;
+  }
+  h1{
+    text-align: center;
+  }
+  #game{
+    position:relative;
+    border-style: solid;
+    border-color: red;
+    width: 551px;
+    height: 538px;
+    margin:auto;
+    background-image: url("pictures/cross.png");
+  }
+  .tf{
+    position: absolute;
+    width : 60px;
+    height: 60px;
+  }
+  #tfx{
+    transform: rotate(90deg);
+    left:440px;
+    top: 490px;
+  }
+  #tfy{
+    transform: rotate(180deg);
+    left:400px;
+    top: 340px;
+  }
+  .carr{
+    position: absolute;
+    top: 484px;
+    left: 0px;
+    width: 50px;
+    height: 50px;
+    transform: rotate(90deg);
+  }
+/*MAX : 315, MIN:15 => 7 cars*/
+  .carb{
+    position: absolute;
+    top: 0px;
+    left: 450px;
+    width: 50px;
+    height: 50px;
+    transform: rotate(180deg);
+  }
+</style>
+
+<body>
+  <h1>
+    The Traffic Lights Simulator
+  </h1>
+
+<div id="game">
+  <div id="cars">
+    <div id="carsr">
+    </div>
+    <div id="carsb">
+    </div>
+  </div>
+  <div id="traffic lights">
+    <img id="tfx" class="tf" src="pictures/red.png">
+    <img id="tfy" class="tf" src="pictures/red.png">
+  </div>
+</div>
+
+</body>
+</html>
+
+
+<script>
+
+//arriveBlueAnim(1,0);
+//moveForwardBlueAnim(1);
+//moveForwardRedAnim(1);
+//leaveBlueAnim(1);
+
+//arriveRedAnim(1,0);
+//moveForwardRedAnim(2);
+//moveForwardRedAnim(1);
+//leaveRedAnim(1);
+
+var green = 1; //-1 => x ; 0=> personne; 1 => y
+var model = 1;
+var x_left=0;
+var x_tot = 0;
+var y_left=0;
+var y_tot = 0;
+changeLight();
+main();
+
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}
+
+function main(){
+  if (Math.random()<1){
+    x_tot++;
+    if (x_tot-x_left > 7){
+      alert('Too much cars in x');
+    }
+    document.getElementById("carsr").innerHTML += "<img id='r"+x_tot+"' class='carr' src='pictures/car_r.png'>\n";
+    arriveRedAnim(x_tot);
+  }
+  if (Math.random()<0.2){
+    y_tot++;
+    if (y_tot-y_left > 7){
+      alert('Too much cars in y');
+    }
+    document.getElementById("carsb").innerHTML += "<img id='b"+y_tot+"' class='carb' src='pictures/car_b.png'>\n";
+    arriveBlueAnim(y_tot);
+  }
+  sleep(3000);
+
+  if (green == -1){
+    if (x_tot-x_left>0){
+      x_left++;
+      leaveRedAnim(x_left);
+    }
+  }
+  if (green == 1){
+    if (y_tot-y_left>0){
+      y_left++;
+      leaveRedAnim(y_left);
+    }
+  }
+  setTimeout(main,3000);//maxtime animation 
+}
+
+function changeLight(){
+  if (model == 2){
+    green = 0;
+    document.getElementById("tfy").src = "pictures/red.png";
+    document.getElementById("tfx").src = "pictures/red.png";
+    clock = Date();
+    start = clock.getTime();
+    while( clock.getTime() - start < 3000){
+      ;
+    }
+  }
+  green = -1*green;
+  if (green<0){
+    document.getElementById("tfx").src = "pictures/green.png";
+    document.getElementById("tfy").src = "pictures/red.png"; 
+  }
+  else{
+    document.getElementById("tfx").src = "pictures/red.png";
+    document.getElementById("tfy").src = "pictures/green.png";
+  }
+
+  setTimeout(changeLight,15000);
+}
+
+
+function moveForwardRedAnim(id){
+  var elem = document.getElementById("r"+id); 
+  var posx = parseInt(window.getComputedStyle(elem,null).getPropertyValue("left"));
+  var bound = posx+50;
+  var interval = setInterval(frame,5);
+  function frame(){
+    if (posx == bound){
+      clearInterval(interval);
+    }
+    else{
+      posx++;
+      elem.style.left = posx+"px";
+    }
+  }
+}
+
+function leaveRedAnim(id){
+  var elem = document.getElementById("r"+id);   
+  var posx = 315;
+  var posy = 484;
+  var deg = 90;
+  var c = 0;
+  var interval1 = setInterval(frame1, 30);
+  function frame1() {
+    if (c == 17) {
+      clearInterval(interval1);
+      var id2 = setInterval(frame2, 1);
+    }
+    else {
+      c++;
+      if (c>0 && c<16){
+        deg = deg-6;
+        elem.style.transform = "rotate("+deg+"deg)";
+      }
+      posx = posx+(17-c)+2;
+      posy = posy-c
+      elem.style.left = posx  +"px";
+      elem.style.top  = posy  +"px"; 
+    }
+  }
+  function frame2(){
+    if (posy < 0) {
+      clearInterval(id2);
+    }
+    else {
+      posy = posy -2;  
+      elem.style.top = posy + "px";
+    }
+  }
+}
+
+function arriveRedAnim(nb) {
+  var elem = document.getElementById("r"+nb);
+  var pos = 0;
+  var id = setInterval(frame, 5);
+  function frame() {
+    if (pos == 315-((nb-1)*50)) {
+      clearInterval(id);
+    }
+    else {
+      pos++;  
+      elem.style.left = pos + "px";
+    }
+  }
+}
+
+function moveForwardBlueAnim(id){
+  var elem = document.getElementById("b"+id); 
+  var posy = parseInt(window.getComputedStyle(elem,null).getPropertyValue("top"));
+  var bound = posy+50;
+  var interval = setInterval(frame,5);
+  function frame(){
+    if (posy == bound){
+      clearInterval(interval);
+    }
+    else{
+      posy++;
+      elem.style.top = posy+"px";
+    }
+  }
+}
+
+function leaveBlueAnim(id){
+  var elem = document.getElementById("b"+id);   
+  var posx = 445;
+  var posy = 310;
+  var deg = 180;
+  var c = 0;
+  var interval1 = setInterval(frame1, 30);
+  function frame1() {
+    if (c == 17) {
+      clearInterval(interval1);
+      var id2 = setInterval(frame2, 1);
+    }
+    else {
+      c++;
+      if (c>0 && c<16){
+        deg = deg+6;
+        elem.style.transform = "rotate("+deg+"deg)";
+      }
+      posy = posy+(17-c);
+      posx = posx-c
+      elem.style.left = posx  +"px";
+      elem.style.top  = posy  +"px"; 
+    }
+  }
+  function frame2(){
+    if (posx < 0) {
+      document.getElementById("p1").innerHTML 
+      clearInterval(id2);
+    }
+    else {
+      posx = posx -2;  
+      elem.style.left = posx + "px";
+    }
+  }
+}
+
+function arriveBlueAnim(nb2) {
+  var elem = document.getElementById("b"+nb2);   
+  var pos = 0;
+  var id2 = setInterval(frame, 5);
+  function frame() {
+    if (pos == 310-((nb2-1)*50)) {
+      clearInterval(id2);
+    }
+    else {
+      pos++;  
+      elem.style.top = pos + "px";
+    }
+  }
+}
+</script>
