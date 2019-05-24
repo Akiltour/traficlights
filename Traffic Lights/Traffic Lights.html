@@ -103,24 +103,23 @@ function sleep(milliseconds) {
   }
 }
 
-function main(){
+async function main(){
   if (Math.random()<1){
     x_tot++;
     if (x_tot-x_left > 7){
       alert('Too much cars in x');
     }
     document.getElementById("carsr").innerHTML += "<img id='r"+x_tot+"' class='carr' src='pictures/car_r.png'>\n";
-    arriveRedAnim(x_tot);
+    await arriveRedAnim(x_tot);
   }
-  if (Math.random()<0.2){
+  if (Math.random()<1){
     y_tot++;
     if (y_tot-y_left > 7){
       alert('Too much cars in y');
     }
     document.getElementById("carsb").innerHTML += "<img id='b"+y_tot+"' class='carb' src='pictures/car_b.png'>\n";
-    arriveBlueAnim(y_tot);
+    await arriveBlueAnim(y_tot);
   }
-  sleep(3000);
 
   if (green == -1){
     if (x_tot-x_left>0){
@@ -131,7 +130,7 @@ function main(){
   if (green == 1){
     if (y_tot-y_left>0){
       y_left++;
-      leaveRedAnim(y_left);
+      leaveBlueAnim(y_left);
     }
   }
   setTimeout(main,3000);//maxtime animation 
@@ -162,7 +161,7 @@ function changeLight(){
 }
 
 
-function moveForwardRedAnim(id){
+async function moveForwardRedAnim(id){
   var elem = document.getElementById("r"+id); 
   var posx = parseInt(window.getComputedStyle(elem,null).getPropertyValue("left"));
   var bound = posx+50;
@@ -178,7 +177,7 @@ function moveForwardRedAnim(id){
   }
 }
 
-function leaveRedAnim(id){
+async function leaveRedAnim(id){
   var elem = document.getElementById("r"+id);   
   var posx = 315;
   var posy = 484;
@@ -204,6 +203,7 @@ function leaveRedAnim(id){
   }
   function frame2(){
     if (posy < 0) {
+      elem.innerHTML ="";
       clearInterval(id2);
     }
     else {
@@ -213,7 +213,7 @@ function leaveRedAnim(id){
   }
 }
 
-function arriveRedAnim(nb) {
+async function arriveRedAnim(nb) {
   var elem = document.getElementById("r"+nb);
   var pos = 0;
   var id = setInterval(frame, 5);
@@ -228,7 +228,7 @@ function arriveRedAnim(nb) {
   }
 }
 
-function moveForwardBlueAnim(id){
+async function moveForwardBlueAnim(id){
   var elem = document.getElementById("b"+id); 
   var posy = parseInt(window.getComputedStyle(elem,null).getPropertyValue("top"));
   var bound = posy+50;
@@ -244,7 +244,7 @@ function moveForwardBlueAnim(id){
   }
 }
 
-function leaveBlueAnim(id){
+async function leaveBlueAnim(id){
   var elem = document.getElementById("b"+id);   
   var posx = 445;
   var posy = 310;
@@ -270,7 +270,7 @@ function leaveBlueAnim(id){
   }
   function frame2(){
     if (posx < 0) {
-      document.getElementById("p1").innerHTML 
+      elem.innerHTML ="";
       clearInterval(id2);
     }
     else {
@@ -280,7 +280,7 @@ function leaveBlueAnim(id){
   }
 }
 
-function arriveBlueAnim(nb2) {
+async function arriveBlueAnim(nb2) {
   var elem = document.getElementById("b"+nb2);   
   var pos = 0;
   var id2 = setInterval(frame, 5);
