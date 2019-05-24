@@ -1,72 +1,77 @@
 <!DOCTYPE html>
 <html>
 <style>
-  html{
-    background-color: black;
-    color:white;
-  }
-  h1{
-    text-align: center;
-  }
-  #game{
-    position:relative;
-    border-style: solid;
-    border-color: red;
-    width: 551px;
-    height: 538px;
-    margin:auto;
-    background-image: url("pictures/cross.png");
-  }
-  .tf{
-    position: absolute;
-    width : 60px;
-    height: 60px;
-  }
-  #tfx{
-    transform: rotate(90deg);
-    left:440px;
-    top: 490px;
-  }
-  #tfy{
-    transform: rotate(180deg);
-    left:400px;
-    top: 340px;
-  }
-  .carr{
-    position: absolute;
-    top: 484px;
-    left: 0px;
-    width: 50px;
-    height: 50px;
-    transform: rotate(90deg);
-  }
+	html{
+		background-color: black;
+		color:white;
+	}
+	h1{
+		text-align: center;
+	}
+	#chrono{
+		color: black;
+		padding-left: 5px;
+	}
+	#game{
+		position:relative;
+		border-style: solid;
+		border-color: red;
+		width: 551px;
+		height: 538px;
+		margin:auto;
+		background-image: url("pictures/cross.png");
+	}
+	.tf{
+		position: absolute;
+		width : 60px;
+		height: 60px;
+	}
+	#tfx{
+		transform: rotate(90deg);
+		left:440px;
+		top: 490px;
+	}
+	#tfy{
+		transform: rotate(180deg);
+		left:400px;
+		top: 340px;
+	}
+	.carr{
+		position: absolute;
+		top: 484px;
+		left: 0px;
+		width: 50px;
+		height: 50px;
+		transform: rotate(90deg);
+	}
 /*MAX : 315, MIN:15 => 7 cars*/
-  .carb{
-    position: absolute;
-    top: 0px;
-    left: 450px;
-    width: 50px;
-    height: 50px;
-    transform: rotate(180deg);
-  }
+	.carb{
+		position: absolute;
+		top: 0px;
+		left: 450px;
+		width: 50px;
+		height: 50px;
+		transform: rotate(180deg);
+	}
 </style>
 
 <body>
-  <h1>
-    The Traffic Lights Simulator
-  </h1>
+	<h1>
+		The Traffic Lights Simulator
+	</h1>
 
 <div id="game">
-  <div id="cars">
-    <div id="carsr">
-    </div>
-    <div id="carsb">
-    </div>
-  </div>
-  <div id="traffic lights">
-    <img id="tfx" class="tf" src="pictures/red.png">
-    <img id="tfy" class="tf" src="pictures/red.png">
-  </div>
+	<p id="chrono">Clock: 0</p>
+	<div id="cars">
+		<div id="carsr">
+		</div>
+		<div id="carsb">
+		</div>
+	</div>
+	<div id="traffic lights">
+		<img id="tfx" class="tf" src="pictures/green.png">
+		<img id="tfy" class="tf" src="pictures/red.png">
+	</div>
 </div>
 
 </body>
@@ -85,7 +90,7 @@
 //moveForwardRedAnim(1);
 //leaveRedAnim(1);
 
-var green = 1; //-1 => x ; 0=> personne; 1 => y
+var green = -1; //-1 => x ; 0=> personne; 1 => y
 var model = 1;
 var x_left=0;
 var x_tot = 0;
@@ -93,205 +98,832 @@ var y_left=0;
 var y_tot = 0;
 changeLight();
 main();
+var clock = 1;
+function main(){
+	clock++;
+	document.getElementById("chrono").innerHTML = "Clock: "+clock;
 
-function sleep(milliseconds) {
-  var start = new Date().getTime();
-  for (var i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > milliseconds){
-      break;
-    }
-  }
-}
-
-async function main(){
-  if (Math.random()<1){
-    x_tot++;
-    if (x_tot-x_left > 7){
-      alert('Too much cars in x');
-    }
-    document.getElementById("carsr").innerHTML += "<img id='r"+x_tot+"' class='carr' src='pictures/car_r.png'>\n";
-    await arriveRedAnim(x_tot);
-  }
-  if (Math.random()<1){
-    y_tot++;
-    if (y_tot-y_left > 7){
-      alert('Too much cars in y');
-    }
-    document.getElementById("carsb").innerHTML += "<img id='b"+y_tot+"' class='carb' src='pictures/car_b.png'>\n";
-    await arriveBlueAnim(y_tot);
-  }
-
-  if (green == -1){
-    if (x_tot-x_left>0){
-      x_left++;
-      leaveRedAnim(x_left);
-    }
-  }
-  if (green == 1){
-    if (y_tot-y_left>0){
-      y_left++;
-      leaveBlueAnim(y_left);
-    }
-  }
-  setTimeout(main,3000);//maxtime animation 
+	var rand = Math.random();
+	
+	if (rand<0.32){ //just red
+		x_tot++;
+		if (x_tot-x_left > 7){
+			alert('Too much cars in x');
+		}
+		document.getElementById("carsr").innerHTML += "<img id='r"+x_tot+"' class='carr' src='pictures/car_r.png'>\n";
+		if (green == -1){
+			x_left++;
+			if (x_tot > x_left){
+				redcomeandredleave();
+			}
+			else{
+				sameredcomeandleave();
+			}
+		}
+		else{
+			if (y_tot > y_left){
+				y_left++;
+				redcomeandblueleave();
+			}
+			else{
+				redcome();
+			}
+		}
+	}
+	else{
+	
+	if (rand<0.8){ //no one
+		if (green == -1){
+			if (x_tot>x_left){
+				x_left++;
+				redleave();
+			}
+		}
+		else{
+			if (y_tot > y_left){
+				y_left++;
+				blueleave();
+			}
+		}
+	}
+	else{
+	if (rand<0.92){//just blue
+		y_tot++;
+		if (y_tot-y_left > 7){
+			alert('Too much cars in y');
+		}
+		document.getElementById("carsb").innerHTML += "<img id='b"+y_tot+"' class='carb' src='pictures/car_b.png'>\n";
+		if (green == -1){
+			if (x_tot>x_left){
+				x_left++;
+				bluecomeandredleave();
+			}
+			else{
+				bluecome();
+			}
+		}
+		else{
+			if (y_tot > y_left){
+				y_left++;
+				samebluecomeandleave();
+			}
+			else{
+				bluecomeandblueleave();
+			}
+		}
+	}
+	else{//blue and red
+		y_tot++;
+		if (y_tot-y_left > 7){
+			alert('Too much cars in y');
+		}
+		document.getElementById("carsb").innerHTML += "<img id='b"+y_tot+"' class='carb' src='pictures/car_b.png'>\n";
+		x_tot++;
+		if (x_tot-x_left > 7){
+			alert('Too much cars in x');
+		}
+		document.getElementById("carsr").innerHTML += "<img id='r"+x_tot+"' class='carr' src='pictures/car_r.png'>\n";
+		if (green == -1){
+			x_left++;
+			if (x_left==x_tot){
+				bluecomeandsameredcomeandleave();
+			}
+			else{
+				bluecomeandredcomeandredleave();
+			}
+		}
+	
+		else{
+			y_left++;
+			if (y_left == y_tot){
+				redcomeandsamebluecomeandleave();
+			}
+			else{
+				redcomeandbluecomeandblueleave();
+			}
+		}
+	}
+	}
+	}
+	setTimeout(main,1500);//maxtime animation 
 }
 
 function changeLight(){
-  if (model == 2){
-    green = 0;
-    document.getElementById("tfy").src = "pictures/red.png";
-    document.getElementById("tfx").src = "pictures/red.png";
-    clock = Date();
-    start = clock.getTime();
-    while( clock.getTime() - start < 3000){
-      ;
-    }
-  }
-  green = -1*green;
-  if (green<0){
-    document.getElementById("tfx").src = "pictures/green.png";
-    document.getElementById("tfy").src = "pictures/red.png"; 
-  }
-  else{
-    document.getElementById("tfx").src = "pictures/red.png";
-    document.getElementById("tfy").src = "pictures/green.png";
-  }
+	/*if (model == 2){
+		green = 0;
+		document.getElementById("tfy").src = "pictures/red.png";
+		document.getElementById("tfx").src = "pictures/red.png";
+		clock = Date();
+		start = clock.getTime();
+		while( clock.getTime() - start < 3000){
+			;
+		}
+	}*/
+	green = -1*green;
+	if (green<0){
+		document.getElementById("tfx").src = "pictures/green.png";
+		document.getElementById("tfy").src = "pictures/red.png"; 
+	}
+	else{
+		document.getElementById("tfx").src = "pictures/red.png";
+		document.getElementById("tfy").src = "pictures/green.png";
+	}
 
-  setTimeout(changeLight,15000);
+	setTimeout(changeLight,15000);
+}
+
+function redcome(){
+	var elem_in = document.getElementById("r"+x_tot);
+	var pos = 0;
+	var interval1 = setInterval(frame, 15);
+	function frame(){
+		if (pos< 315-((x_tot-x_left-1)*50)){
+			pos += Math.min(10,315-((x_tot-x_left-1)*50)-pos);
+			elem_in.style.left = pos + "px";
+		}
+		else{
+			clearInterval(interval1);
+		}
+	}
+}
+
+function redleave(){
+	var elem_out = document.getElementById("r"+x_left);
+	var elems = [];
+	for (var i = x_left+1; i<=x_tot; ++i){
+		elems[i-x_left-1] = document.getElementById("r"+i);
+	}
+	var pos = 0;
+	var posx = 315;
+	var posy = 484;
+	var deg = 90;
+	var c = 0;
+	
+	var interval1 = setInterval(frame, 15);
+	function frame(){
+		var end = true;
+		//Deplacement leaving
+		if (c >= 17 && posy>2) {
+			posy = posy-8;  
+			elem_out.style.top = posy + "px";
+			elem_out.style.left = 468
+			end = false;
+		}
+		else {
+		if (c<17){
+			c++;
+			if (c>0 && c<16){
+				deg = deg-6;
+				elem_out.style.transform = "rotate("+deg+"deg)";
+			}
+			posx = posx+(17-c)+2;
+			posy = posy-c
+			elem_out.style.left = posx  +"px";
+			elem_out.style.top  = posy  +"px";
+			end = false;
+		}
+		else{
+			elem_out.style.visibility = "hidden";
+		}
+		}
+		//Deplacement forward
+		if (c<=10){
+			for (var i = 0; i<elems.length;++i){
+				pos = parseInt(elems[i].style.left);
+				pos += 5
+				elems[i].style.left = pos+"px";
+			}
+			end = false;
+		}
+		//Deplacement new
+		if(end){
+			clearInterval(interval1);
+		}
+	}
+}
+
+function redcomeandredleave(){
+	var elem_out = document.getElementById("r"+x_left);
+	var elem_in = document.getElementById("r"+x_tot);
+	var elems = [];
+	for (var i = x_left+1; i<x_tot; ++i){
+		elems[i-x_left-1] = document.getElementById("r"+i);
+	}
+
+	var pos = 0;
+	var posx = 315;
+	var posy = 484;
+	var deg = 90;
+	var c = 0;
+	
+	var interval1 = setInterval(frame, 15);
+	function frame() {
+		var end = true;
+		//Deplacement leaving
+		if (c >= 17 && posy>2) {
+			posy = posy-8;  
+			elem_out.style.top = posy + "px";
+			end = false;
+		}
+		else {
+		if (c<17){
+			c++;
+			if (c>0 && c<16){
+				deg = deg-6;
+				elem_out.style.transform = "rotate("+deg+"deg)";
+			}
+			posx = posx+(17-c)+2;
+			posy = posy-c
+			elem_out.style.left = posx  +"px";
+			elem_out.style.top  = posy  +"px";
+			end = false;
+		}
+		else{
+			elem_out.style.visibility = "hidden";
+		}
+		}
+		//Deplacement forward
+		if (c<=10){
+			for (var i = 0; i<elems.length;++i){
+				elems[i].style.left = parseInt(elems[i].style.left)+5+"px";
+			}
+			end = false;
+		}
+		//Deplacement new
+		if (pos< 315-((x_tot-x_left-2)*50)){
+			pos += Math.min(10,315-((x_tot-x_left-1)*50)-pos);
+			elem_in.style.left = pos + "px";
+			end = false;
+		}
+		if(end){
+			clearInterval(interval1);
+		}
+	}
+}
+
+function sameredcomeandleave(){
+	var elem = document.getElementById("r"+x_left);
+	var posx = 0;
+	var posy = 484;
+	var deg = 90;
+	var c = 0;
+	
+	var interval1 = setInterval(frame, 15);
+	function frame() {
+		if (posx < 315){
+			posx+=15;
+			elem.style.left = posx+"px";
+		}
+		else {
+		if (c<17){
+			c++;
+			if (c>0 && c<16){
+				deg = deg-6;
+				elem.style.transform = "rotate("+deg+"deg)";
+			}
+			posx = posx+(17-c)+2;
+			posy = posy-c
+			elem.style.left = posx  +"px";
+			elem.style.top  = posy  +"px";
+			end = false;
+		}
+		else{
+		if (c >= 17 && posy>2) {
+			posy = posy -8;  
+			elem.style.top = posy + "px";
+			end = false;
+		}
+		else{
+			elem.style.visibility = "hidden";
+			clearInterval(interval1);
+		}
+		}
+		}
+	}
 }
 
 
-async function moveForwardRedAnim(id){
-  var elem = document.getElementById("r"+id); 
-  var posx = parseInt(window.getComputedStyle(elem,null).getPropertyValue("left"));
-  var bound = posx+50;
-  var interval = setInterval(frame,5);
-  function frame(){
-    if (posx == bound){
-      clearInterval(interval);
-    }
-    else{
-      posx++;
-      elem.style.left = posx+"px";
-    }
-  }
+function bluecome(){
+	var elem_in = document.getElementById("b"+y_tot);
+	var pos = 0;
+	var id2 = setInterval(frame, 15);
+	function frame() {
+		if (pos == 310-((y_tot-y_left-1)*50)) {
+			clearInterval(id2);
+		}
+		else {
+			pos += Math.min(10,310-((y_tot-y_left-1)*50)-pos);
+			elem_in.style.top = pos + "px";
+		}
+	}
 }
 
-async function leaveRedAnim(id){
-  var elem = document.getElementById("r"+id);   
-  var posx = 315;
-  var posy = 484;
-  var deg = 90;
-  var c = 0;
-  var interval1 = setInterval(frame1, 30);
-  function frame1() {
-    if (c == 17) {
-      clearInterval(interval1);
-      var id2 = setInterval(frame2, 1);
-    }
-    else {
-      c++;
-      if (c>0 && c<16){
-        deg = deg-6;
-        elem.style.transform = "rotate("+deg+"deg)";
-      }
-      posx = posx+(17-c)+2;
-      posy = posy-c
-      elem.style.left = posx  +"px";
-      elem.style.top  = posy  +"px"; 
-    }
-  }
-  function frame2(){
-    if (posy < 0) {
-      elem.innerHTML ="";
-      clearInterval(id2);
-    }
-    else {
-      posy = posy -2;  
-      elem.style.top = posy + "px";
-    }
-  }
+
+function blueleave(){
+	var elem_out = document.getElementById("b"+y_left);
+	var elems = [];
+	for (var i = y_left+1; i<=y_tot; ++i){
+		elems[i-y_left-1] = document.getElementById("b"+i);
+	}
+
+	var posx = 445;
+	var posy = 310;
+	var deg = 180;
+	var c = 0;
+	
+	var interval1 = setInterval(frame, 15);
+	function frame(){
+		var end = true;
+		if (c<17) {
+			c++;
+			if (c>0 && c<16){
+				deg = deg+6;
+				elem_out.style.transform = "rotate("+deg+"deg)";
+			}
+			posy = posy+(17-c);
+			posx = posx-c;
+			elem_out.style.left = posx  +"px";
+			elem_out.style.top  = posy  +"px";
+			end=false;
+		}
+		else{
+		if (posx>0){
+			posx = posx - 8;
+			elem_out.style.left = posx+"px";
+			end = false;
+		}
+		else{
+			elem_out.style.visibility = "hidden";
+		}
+		}
+		//Deplacement forward
+		if (c<=10){
+			for (var i = 0; i<elems.length;++i){
+				pos = parseInt(elems[i].style.top);
+				pos += 5
+				elems[i].style.top = pos+"px";
+			}
+			end = false;
+		}
+		if (end){
+			clearInterval(interval1);
+		}
+	}
 }
 
-async function arriveRedAnim(nb) {
-  var elem = document.getElementById("r"+nb);
-  var pos = 0;
-  var id = setInterval(frame, 5);
-  function frame() {
-    if (pos == 315-((nb-1)*50)) {
-      clearInterval(id);
-    }
-    else {
-      pos++;  
-      elem.style.left = pos + "px";
-    }
-  }
+function samebluecomeandleave(){
+	var elem = document.getElementById("b"+y_left);
+	var posx = 450;
+	var posy = 0;
+	var deg = 180;
+	var c = 0;
+	
+	var interval1 = setInterval(frame, 15);
+	function frame() {
+		if (posy < 310){
+			posy+=Math.min(15,310-posy);
+			elem.style.top = posy+"px";
+		}
+		else {
+		if (c<17){
+			c++;
+			if (c>0 && c<16){
+				deg = deg+6;
+				elem.style.transform = "rotate("+deg+"deg)";
+			}
+			posy = posy+(17-c);
+			posx = posx-c;
+			elem.style.left = posx  +"px";
+			elem.style.top  = posy  +"px";
+		}
+		else{
+		if (posx>0) {
+			posx = posx -8;  
+			elem.style.left = posx + "px";
+		}
+		else{
+			elem.style.visibility = "hidden";
+			clearInterval(interval1);
+		}
+		}
+		}
+	}
 }
 
-async function moveForwardBlueAnim(id){
-  var elem = document.getElementById("b"+id); 
-  var posy = parseInt(window.getComputedStyle(elem,null).getPropertyValue("top"));
-  var bound = posy+50;
-  var interval = setInterval(frame,5);
-  function frame(){
-    if (posy == bound){
-      clearInterval(interval);
-    }
-    else{
-      posy++;
-      elem.style.top = posy+"px";
-    }
-  }
+function bluecomeandblueleave(){
+	var elem_in = document.getElementById("b"+y_tot);
+	var elem_out = document.getElementById("b"+y_left);
+	var elems = [];
+	for (var i = y_left+1; i<y_tot; ++i){
+		elems[i-y_left-1] = document.getElementById("b"+i);
+	}
+
+	var pos = 0;
+	var pos_new = 0;
+	var posx = 445;
+	var posy = 310;
+	var deg = 180;
+	var c = 0;
+	
+	var interval1 = setInterval(frame, 15);
+	function frame(){
+		var end = true;
+		if (pos_new < 310-((y_tot-y_left-1)*50)) {
+			pos_new += Math.min(10,310-((y_tot-y_left-1)*50)-pos_new);
+			elem_in.style.top = pos_new + "px";
+			end=false;
+		}
+		if (c<17) {
+			c++;
+			if (c>0 && c<16){
+				deg = deg+6;
+				elem_out.style.transform = "rotate("+deg+"deg)";
+			}
+			posy = posy+(17-c);
+			posx = posx-c;
+			elem_out.style.left = posx  +"px";
+			elem_out.style.top  = posy  +"px";
+			end=false;
+		}
+		else{
+		if (posx>0){
+			posx = posx - 8;
+			elem_out.style.left = posx+"px";
+			end = false;
+		}
+		else{
+			elem_out.style.visibility = "hidden";
+		}
+		}
+		//Deplacement forward
+		if (c<=10){
+			for (var i = 0; i<elems.length;++i){
+				pos = parseInt(elems[i].style.top);
+				pos += 5
+				elems[i].style.top = pos+"px";
+			}
+			end = false;
+		}
+		if (end){
+			clearInterval(interval1);
+		}
+	}
 }
 
-async function leaveBlueAnim(id){
-  var elem = document.getElementById("b"+id);   
-  var posx = 445;
-  var posy = 310;
-  var deg = 180;
-  var c = 0;
-  var interval1 = setInterval(frame1, 30);
-  function frame1() {
-    if (c == 17) {
-      clearInterval(interval1);
-      var id2 = setInterval(frame2, 1);
-    }
-    else {
-      c++;
-      if (c>0 && c<16){
-        deg = deg+6;
-        elem.style.transform = "rotate("+deg+"deg)";
-      }
-      posy = posy+(17-c);
-      posx = posx-c
-      elem.style.left = posx  +"px";
-      elem.style.top  = posy  +"px"; 
-    }
-  }
-  function frame2(){
-    if (posx < 0) {
-      elem.innerHTML ="";
-      clearInterval(id2);
-    }
-    else {
-      posx = posx -2;  
-      elem.style.left = posx + "px";
-    }
-  }
+function redcomeandblueleave(){
+	var elem_in = document.getElementById("r"+x_tot);
+	var elem_out = document.getElementById("b"+y_left);
+	var elems = [];
+	for (var i = y_left+1; i<=y_tot; ++i){
+		elems[i-y_left-1] = document.getElementById("b"+i);
+	}
+
+	var pos = 0;
+	var pos_new = 0;
+	var posx = 445;
+	var posy = 310;
+	var deg = 180;
+	var c = 0;
+	
+	var interval1 = setInterval(frame, 15);
+	function frame(){
+		var end = true;
+		//red come
+		if (pos_new< 315-((x_tot-x_left-1)*50)){
+			pos_new += Math.min(10,315-((x_tot-x_left-1)*50)-pos_new);
+			elem_in.style.left = pos_new + "px";
+			end=false;
+		}
+		//blue leave
+		if (c<17) {
+			c++;
+			if (c>0 && c<16){
+				deg = deg+6;
+				elem_out.style.transform = "rotate("+deg+"deg)";
+			}
+			posy = posy+(17-c);
+			posx = posx-c;
+			elem_out.style.left = posx  +"px";
+			elem_out.style.top  = posy  +"px";
+			end=false;
+		}
+		else{
+		if (posx>0){
+			posx = posx - 8;
+			elem_out.style.left = posx+"px";
+			end = false;
+		}
+		else{
+			elem_out.style.visibility = "hidden";
+		}
+		}
+		//Deplacement forward
+		if (c<=10){
+			for (var i = 0; i<elems.length;++i){
+				pos = parseInt(elems[i].style.top);
+				pos += 5
+				elems[i].style.top = pos+"px";
+			}
+			end = false;
+		}
+		if (end){
+			clearInterval(interval1);
+		}
+	}
 }
 
-async function arriveBlueAnim(nb2) {
-  var elem = document.getElementById("b"+nb2);   
-  var pos = 0;
-  var id2 = setInterval(frame, 5);
-  function frame() {
-    if (pos == 310-((nb2-1)*50)) {
-      clearInterval(id2);
-    }
-    else {
-      pos++;  
-      elem.style.top = pos + "px";
-    }
-  }
+function bluecomeandredleave(){
+	var elem_in = document.getElementById("b"+y_tot);
+	var elem_out = document.getElementById("r"+x_left);
+	var elems = [];
+	for (var i = x_left+1; i<=x_tot; ++i){
+		elems[i-x_left-1] = document.getElementById("r"+i);
+	}
+
+	var pos_new = 0;
+	var pos = 0;
+	var posx = 315;
+	var posy = 484;
+	var deg = 90;
+	var c = 0;
+	
+	var interval1 = setInterval(frame, 15);
+	function frame(){
+		var end = true;
+		//blue come
+		if (pos_new < 310-((y_tot-y_left-1)*50)) {
+			pos_new += Math.min(10,310-((y_tot-y_left-1)*50)-pos_new);
+			elem_in.style.top = pos_new + "px";
+		}
+		//Deplacement leaving
+		if (c >= 17 && posy>2) {
+			posy = posy-8;  
+			elem_out.style.top = posy + "px";
+			end = false;
+		}
+		else {
+		if (c<17){
+			c++;
+			if (c>0 && c<16){
+				deg = deg-6;
+				elem_out.style.transform = "rotate("+deg+"deg)";
+			}
+			posx = posx+(17-c)+2;
+			posy = posy-c
+			elem_out.style.left = posx  +"px";
+			elem_out.style.top  = posy  +"px";
+			end = false;
+		}
+		else{
+			elem_out.style.visibility = "hidden";
+		}
+		}
+		//Deplacement forward
+		if (c<=10){
+			for (var i = 0; i<elems.length;++i){
+				pos = parseInt(elems[i].style.left);
+				pos += 5
+				elems[i].style.left = pos+"px";
+			}
+			end = false;
+		}
+		//Deplacement new
+		if(end){
+			clearInterval(interval1);
+		}
+	}
 }
+
+function bluecomeandredcomeandredleave(){
+	var elem_in_blue = document.getElementById("b"+y_tot);
+	var elem_out = document.getElementById("r"+x_left);
+	var elem_in = document.getElementById("r"+x_tot);
+	var elems = [];
+	for (var i = x_left+1; i<x_tot; ++i){
+		elems[i-x_left-1] = document.getElementById("r"+i);
+	}
+
+	var pos = 0;
+	var pos_blue = 0;
+	var posx = 315;
+	var posy = 484;
+	var deg = 90;
+	var c = 0;
+	
+	var interval1 = setInterval(frame, 15);
+	function frame() {
+		var end = true;
+		//blue come
+		if (pos_blue < 310-((y_tot-y_left-1)*50)) {
+			pos_blue += Math.min(10,310-((y_tot-y_left-1)*50)-pos_blue);
+			elem_in_blue.style.top = pos_blue + "px";
+			end=false;
+		}
+		//Deplacement leaving
+		if (c >= 17 && posy>2) {
+			posy = posy-8;  
+			elem_out.style.top = posy + "px";
+			end = false;
+		}
+		else {
+		if (c<17){
+			c++;
+			if (c>0 && c<16){
+				deg = deg-6;
+				elem_out.style.transform = "rotate("+deg+"deg)";
+			}
+			posx = posx+(17-c)+2;
+			posy = posy-c
+			elem_out.style.left = posx  +"px";
+			elem_out.style.top  = posy  +"px";
+			end = false;
+		}
+		else{
+			elem_out.style.visibility = "hidden";
+		}
+		}
+		//Deplacement forward
+		if (c<=10){
+			for (var i = 0; i<elems.length;++i){
+				elems[i].style.left = parseInt(elems[i].style.left)+5+"px";
+			}
+			end = false;
+		}
+		//Deplacement new
+		if (pos< 315-((x_tot-x_left-2)*50)){
+			pos += Math.min(10,315-((x_tot-x_left-1)*50)-pos);
+			elem_in.style.left = pos + "px";
+			end = false;
+		}
+		if(end){
+			clearInterval(interval1);
+		}
+	}
+}
+
+
+function redcomeandbluecomeandblueleave(){
+	var elem_in_red = document.getElementById("r"+x_tot);
+	var elem_in = document.getElementById("b"+y_tot);
+	var elem_out = document.getElementById("b"+y_left);
+	var elems = [];
+	for (var i = y_left+1; i<y_tot; ++i){
+		elems[i-y_left-1] = document.getElementById("b"+i);
+	}
+
+	var pos = 0;
+	var pos_red = 0;
+	var pos_new = 0;
+	var posx = 445;
+	var posy = 310;
+	var deg = 180;
+	var c = 0;
+	
+	var interval1 = setInterval(frame, 15);
+	function frame(){
+		var end = true;
+		if (pos_red< 315-((x_tot-x_left-1)*50)){
+			pos_red += Math.min(10,315-((x_tot-x_left-1)*50)-pos_red);
+			elem_in_red.style.left = pos_red + "px";
+			end = false;
+		}
+		if (pos_new < 310-((y_tot-y_left-1)*50)) {
+			pos_new += Math.min(10,310-((y_tot-y_left-1)*50)-pos_new);
+			elem_in.style.top = pos_new + "px";
+			end=false;
+		}
+		if (c<17) {
+			c++;
+			if (c>0 && c<16){
+				deg = deg+6;
+				elem_out.style.transform = "rotate("+deg+"deg)";
+			}
+			posy = posy+(17-c);
+			posx = posx-c;
+			elem_out.style.left = posx  +"px";
+			elem_out.style.top  = posy  +"px";
+			end=false;
+		}
+		else{
+		if (posx>0){
+			posx = posx - 8;
+			elem_out.style.left = posx+"px";
+			end = false;
+		}
+		else{
+			elem_out.style.visibility = "hidden";
+		}
+		}
+		//Deplacement forward
+		if (c<=10){
+			for (var i = 0; i<elems.length;++i){
+				pos = parseInt(elems[i].style.top);
+				pos += 5
+				elems[i].style.top = pos+"px";
+			}
+			end = false;
+		}
+		if (end){
+			clearInterval(interval1);
+		}
+	}
+}
+
+
+function bluecomeandsameredcomeandleave(){
+	var elem_in = document.getElementById("b"+y_tot);
+	var pos = 0;
+
+	var elem = document.getElementById("r"+x_left);
+	var posx = 0;
+	var posy = 484;
+	var deg = 90;
+	var c = 0;
+	
+	var interval1 = setInterval(frame, 15);
+	function frame() {
+		//blue come
+		if (pos < 310-((y_tot-y_left-1)*50)) {
+			pos += Math.min(10,310-((y_tot-y_left-1)*50)-pos);
+			elem_in.style.top = pos + "px";
+		}
+		//red come and leave
+		if (posx < 315){
+			posx+=15;
+			elem.style.left = posx+"px";
+		}
+		else {
+		if (c<17){
+			c++;
+			if (c>0 && c<16){
+				deg = deg-6;
+				elem.style.transform = "rotate("+deg+"deg)";
+			}
+			posx = posx+(17-c)+2;
+			posy = posy-c
+			elem.style.left = posx  +"px";
+			elem.style.top  = posy  +"px";
+			end = false;
+		}
+		else{
+		if (c >= 17 && posy>2) {
+			posy = posy -8;  
+			elem.style.top = posy + "px";
+			end = false;
+		}
+		else{
+			elem.style.visibility = "hidden";
+			clearInterval(interval1);
+		}
+		}
+		}
+	}
+}
+
+function redcomeandsamebluecomeandleave(){
+	var elem_in = document.getElementById("r"+x_tot);
+	var pos = 0;
+		
+	var elem = document.getElementById("b"+y_left);
+	var posx = 450;
+	var posy = 0;
+	var deg = 180;
+	var c = 0;
+	
+	var interval1 = setInterval(frame, 15);
+	function frame() {
+		if (pos< 315-((x_tot-x_left-1)*50)){
+			pos += Math.min(10,315-((x_tot-x_left-1)*50)-pos);
+			elem_in.style.left = pos + "px";
+		}
+		if (posy < 310){
+			posy+=Math.min(15,310-posy);
+			elem.style.top = posy+"px";
+		}
+		else {
+		if (c<17){
+			c++;
+			if (c>0 && c<16){
+				deg = deg+6;
+				elem.style.transform = "rotate("+deg+"deg)";
+			}
+			posy = posy+(17-c);
+			posx = posx-c;
+			elem.style.left = posx  +"px";
+			elem.style.top  = posy  +"px";
+		}
+		else{
+		if (posx>0) {
+			posx = posx -8;  
+			elem.style.left = posx + "px";
+		}
+		else{
+			elem.style.visibility = "hidden";
+			clearInterval(interval1);
+		}
+		}
+		}
+	}
+}
+
 </script>
