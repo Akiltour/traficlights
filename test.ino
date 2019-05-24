@@ -1,110 +1,189 @@
-#define LEDAG 3 // Groupe of A.g
-#define LEDBG 6 // Groupe of B.g
-#define LEDAR 2 // Groupe of A.r
-#define LEDBR 5 // Groupe of B.r
-#define LEDEG 8 // Groupe of E.g
-#define LEDER 7 // Groupe of E.r
-#define LEDTRAIN 9 // Groupe of the train
-#define BUTTON1 11
-#define BUTTON2 12
+#define PPTV 2        // pieton parallele au train vert
+#define PTV 3         // pieton perpendiculaires au train vert
+#define PPTR 4        // pieton parallele au train rouge
+#define PTR 5         // pieton perpendiculaires au train rouge
+
+#define VPTV 6        // voiture parallele au train vert
+#define VTV 7         // voiture perpen au train vert
+#define VPTR 8        // voiture parallele au train rouge
+#define VTR 9         // voiture perpen au train rouge
+
+
+#define LEDTRAIN 10   // Train
+#define BUTTONT 11    // Bouton du train
+#define BUTTONP 12    // Bouton des piétons 
+
 #define TIMEOFF 2000
 #define TIMEON 10000
 #define TIMETRAIN 2000
-#define PROBATRAIN 30000 // at any time the proba of arrival of a train is 1/PROBATRAIN
 
+
+//#define PROBATRAIN 1000000 // at any time the proba of arrival of a train is 1/PROBATRAIN
+
+
+bool PRESSEDBUTTON = false;
 int buttonState = 0;
 long randomVal = 256;
 
-void trainTravel(int on1, int on2 , int on3, int on4){
-  digitalWrite(LEDAG,LOW);
-  digitalWrite(LEDBG,LOW);
-  digitalWrite(LEDER,LOW);
-  digitalWrite(LEDAR,HIGH);
-  digitalWrite(LEDBR,HIGH);
-  digitalWrite(LEDEG,HIGH);
-  digitalWrite(LEDTRAIN,HIGH);
-  delay(TIMETRAIN);
-  digitalWrite(LEDAR,LOW);
-  digitalWrite(LEDBR,LOW);
-  digitalWrite(LEDEG,LOW);
-  digitalWrite(LEDTRAIN,LOW);
-  
-  //reset
-  digitalWrite(on1,HIGH);
-  digitalWrite(on2,HIGH);
-  digitalWrite(on3,HIGH);
-  digitalWrite(on4,HIGH);
-  
-}
-
-bool trainRandom(){
-  randomVal = random(0,PROBATRAIN);
-  return randomVal == 0;
-}
-
-void waitAllRed() {
-  digitalWrite(LEDAR,HIGH);
-  digitalWrite(LEDBR,HIGH);
-  digitalWrite(LEDER,HIGH);
-
-  for(int i = 0; i<TIMEOFF; i++){
-      delay(1);
-      if (trainRandom()){
-        trainTravel(LEDAR,LEDER,LEDBR, LEDBR);
-        i = 0;
-      }
-  }
-}
-
-void switchOn(int g1, int g2, int r1, int r2, int button) {
-  digitalWrite(g2-1, LOW);
-  digitalWrite(g1-1, LOW);
-  digitalWrite(g1, HIGH);
-  digitalWrite(g2, HIGH);
-  
-  for(int i = 0; i<TIMEON; ++i){
-      delay(1);
-      if (trainRandom()){
-        trainTravel(g1,g2,r1,r2);
-        i = 0;
-      }
-      buttonState = digitalRead(button);
-      
-      if (buttonState == HIGH) {
-        int rest= TIMEON-i-4000;
-        if (rest < 0){rest = 0;}
-        for (int j = 0; i < rest; ++i){
-          delay(1);
-          if (trainRandom()){
-            trainTravel(g1,g2,r1, r2);
-            j = 0;
-            rest=TIMEON-4000;
-          }
-        }
-        break;
-      }
-  }
-  digitalWrite(g1, LOW);
-  digitalWrite(g2, LOW);
-  
-}
 
 void setup() {
-  pinMode(LEDAG, OUTPUT);
-  pinMode(LEDAR, OUTPUT);
-  pinMode(LEDBG, OUTPUT);
-  pinMode(LEDBR, OUTPUT);
-  pinMode(LEDEG, OUTPUT);
-  pinMode(LEDER, OUTPUT);
+  pinMode(PPTV, OUTPUT);
+  pinMode(PTV, OUTPUT);
+  pinMode(PPTR, OUTPUT);
+  pinMode(PTR, OUTPUT);
+  pinMode(VPTV, OUTPUT);
+  pinMode(VTV, OUTPUT);
+  pinMode(VPTR, OUTPUT);
+  pinMode(VTR, OUTPUT);
+  
   pinMode(LEDTRAIN, OUTPUT);
-  pinMode(BUTTON1, INPUT);
-  pinMode(BUTTON2, INPUT);
+  pinMode(BUTTONP, INPUT);
+  digitalWrite(PPTR,HIGH);
+  digitalWrite(PTR,HIGH);
   
 }
 
-void loop() {
-  waitAllRed();
-  switchOn(LEDAG, LEDAG, LEDBR, LEDER, BUTTON1);
-  waitAllRed();
-  switchOn(LEDBG, LEDEG, LEDAR, LEDAR, BUTTON2);
+void loop(){
+  switchOn(VPTR,VTR,VPTV,VTV);
+  off1();
+  switchOn(VTR,VPTR,VTV,VPTV);
+  off2();
+}
+
+
+void off2(){
+  
+  for(int i = 0; i< TIMEOFF; ++i){
+    delay(1);
+    digitalWrite(PPTR,HIGH);
+    digitalWrite(PTR,HIGH);
+    digitalWrite(VPTR,HIGH);
+    digitalWrite(VTR,HIGH);
+    
+    checkButtonP();
+    if (checkButtonT()){
+        trainTravel();
+        i=0;   
+    }
+  }
+  if(PRESSEDBUTTON){
+    off3();
+  }
+}
+
+void off1(){
+  for(int i = 0; i< TIMEOFF; ++i){
+    delay(1);
+    digitalWrite(PPTR,HIGH);
+    digitalWrite(PTR,HIGH);
+    digitalWrite(VPTR,HIGH);
+    digitalWrite(VTR,HIGH);
+    
+    checkButtonP();
+    if (checkButtonT()){
+        trainTravel();
+        i=0;
+    }
+  }
+  digitalWrite(VPTR,LOW);
+  digitalWrite(VTR,LOW);
+}
+
+void off3(){
+  digitalWrite(PPTR,LOW);
+  digitalWrite(PTR,LOW);
+  digitalWrite(PPTV,HIGH);
+  digitalWrite(PTV,HIGH);
+  digitalWrite(VPTR,HIGH);
+  digitalWrite(VTR,HIGH);
+  
+  for(int i = 0; i< 5000; ++i){
+    delay(1);
+    if (checkButtonT()){
+        trainTravel();
+        i=0;
+        digitalWrite(PPTV,HIGH);
+        digitalWrite(PTV,HIGH);
+        digitalWrite(PPTR,LOW);
+        digitalWrite(PTR,LOW);
+    }
+  }
+  PRESSEDBUTTON = false;
+  digitalWrite(PPTV,LOW);
+  digitalWrite(PTV,LOW);
+  digitalWrite(PPTR,HIGH);
+  digitalWrite(PTR,HIGH);
+  
+}
+
+
+void switchOn(int vptr, int vtr, int vptv, int vtv){
+  digitalWrite(vptr,HIGH);
+  digitalWrite(vtr,LOW);
+  digitalWrite(vptv,LOW);
+  digitalWrite(vtv,HIGH);
+  
+  for(int i = 0; i< TIMEON; ++i){
+    delay(1);
+    checkButtonP();
+    
+    if (checkButtonT()){
+        trainTravel();
+        i=0;
+        digitalWrite(vtv,HIGH);
+        digitalWrite(vtr,LOW);
+     }
+  }
+  digitalWrite(vtv,LOW);
+  digitalWrite(vptr,LOW);
+  
+}
+
+/*bool trainRandom(){
+  randomVal = random(0,PROBATRAIN);
+  return randomVal == 0;
+}*/
+
+
+void checkButtonP(){
+  buttonState = digitalRead(BUTTONP);
+  if(buttonState == HIGH){
+    PRESSEDBUTTON = true;
+  }  
+}
+
+bool checkButtonT(){
+  buttonState = digitalRead(BUTTONT);
+  return buttonState == HIGH;
+}
+
+
+void trainTravel(){
+  digitalWrite(PPTR,HIGH);
+  digitalWrite(PTR,HIGH);
+  digitalWrite(VPTR,HIGH);
+  digitalWrite(VTR,HIGH);
+
+  digitalWrite(PPTV,LOW);
+  digitalWrite(PTV,LOW);
+  digitalWrite(VPTV,LOW);
+  digitalWrite(VTV,LOW);
+
+  for(int i = 0; i<TIMETRAIN/200; ++i){
+      digitalWrite(LEDTRAIN,LOW);
+      for(int j=0; j<100; j++){
+        delay(1);
+        checkButtonP();
+      }
+      digitalWrite(LEDTRAIN,HIGH);
+      for(int k=0; k<100; k++){
+        delay(1);
+        checkButtonP();
+      }
+  }
+  for(int i = 0; i<TIMETRAIN; ++i){
+    delay(1);
+    checkButtonP();  
+  }
+  digitalWrite(LEDTRAIN,LOW);
 }
