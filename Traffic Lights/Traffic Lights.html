@@ -266,7 +266,7 @@ function redleave(){
 		if (c >= 17 && posy>2) {
 			posy = posy-8;  
 			elem_out.style.top = posy + "px";
-			elem_out.style.left = 468
+			elem_out.style.left = 502+"px"
 			end = false;
 		}
 		else {
@@ -306,6 +306,7 @@ function redcomeandredleave(){
 	var elem_out = document.getElementById("r"+x_left);
 	var elem_in = document.getElementById("r"+x_tot);
 	var elems = [];
+	
 	for (var i = x_left+1; i<x_tot; ++i){
 		elems[i-x_left-1] = document.getElementById("r"+i);
 	}
@@ -528,6 +529,7 @@ function bluecomeandblueleave(){
 	var interval1 = setInterval(frame, 15);
 	function frame(){
 		var end = true;
+		console.log(pos_new);
 		if (pos_new < 310-((y_tot-y_left-1)*50)) {
 			pos_new += Math.min(10,310-((y_tot-y_left-1)*50)-pos_new);
 			elem_in.style.top = pos_new + "px";
