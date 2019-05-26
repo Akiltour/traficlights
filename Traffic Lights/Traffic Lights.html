@@ -4,13 +4,14 @@
 	html{
 		background-color: black;
 		color:white;
+		font-family: Lato,Helvetica,Arial,sans-serif;
 	}
 	h1{
 		text-align: center;
 	}
-	#chrono{
-		color: black;
-		padding-left: 5px;
+	#commands{
+		text-align: center;
+		padding-bottom: 10px;
 	}
 	#game{
 		position:relative;
@@ -20,6 +21,8 @@
 		height: 538px;
 		margin:auto;
 		background-image: url("pictures/cross.png");
+		color: black;
+		padding-left: 5px;
 	}
 	.tf{
 		position: absolute;
@@ -60,8 +63,29 @@
 		The Traffic Lights Simulator
 	</h1>
 
+<div id="commands">
+	<form action="Traffic%20Lights.html" method="get">
+		Duration of green on x axis:<br>
+		<input type="number" name="endx" value="10">
+		<br>
+		Duration of green on y axis:<br>
+		<input type="number" name="endy" value="10">
+		<br>
+		Proba car comes on x axis (over 10):<br>
+		<input type="number" name="probx" value="4">
+		<br>
+		Proba car comes on y axis (over 10):<br>
+		<input type="number" name="proby" value="2">
+		<br><br>
+		<input type="submit" value="Submit">
+	</form> 
+	</div>
+
 <div id="game">
-	<p id="chrono">Clock: 0</p>
+	<p id="chrono">Clock: 1</p>
+	<p id="queue">Total waiting time: </p>
+	<p id="tot_out">Total out: </p>
+	
 	<div id="cars">
 		<div id="carsr">
 		</div>
@@ -79,33 +103,69 @@
 
 
 <script>
-
-//arriveBlueAnim(1,0);
-//moveForwardBlueAnim(1);
-//moveForwardRedAnim(1);
-//leaveBlueAnim(1);
-
-//arriveRedAnim(1,0);
-//moveForwardRedAnim(2);
-//moveForwardRedAnim(1);
-//leaveRedAnim(1);
-
-var green = -1; //-1 => x ; 0=> personne; 1 => y
+var tot_waiting = 0;
+var green = 1; //-1 => x ; 0=> personne; 1 => y
 var model = 1;
 var x_left=0;
 var x_tot = 0;
 var y_left=0;
 var y_tot = 0;
+var clock = 0;
+var probx = getProbaX();
+var proby = getProbaY();
+var endx = getEndx();
+var endy = getEndy();
 changeLight();
 main();
-var clock = 1;
+
+function getEndx(){
+	var str = window.location.href
+	if (str.indexOf("endx=") == -1){
+		return 10000;
+	}
+	else{
+		return parseInt(str.substring(str.search("endx=")+5,str.search("&")))*1000;
+	}
+}
+
+function getEndy(){
+	var str = window.location.href
+	if (str.indexOf("endy=") == -1){
+		return 10000;
+	}
+	else{
+		return parseInt(str.substring(str.search("endy=")+5,str.search("probx")-1))*1000;
+	}
+}
+
+function getProbaX(){
+	var str = window.location.href
+	if (str.indexOf("probx=") == -1){
+		return 0.4;
+	}
+	else{
+		return parseInt(str.substring(str.search("probx=")+6,str.search("proby")-1))/10;
+	}
+}
+
+function getProbaY(){
+	var str = window.location.href
+	if (str.indexOf("proby=") == -1){
+		return 0.2;
+	}
+	else{
+		return parseInt(str.substring(str.search("proby=")+6))/10;
+	}
+}
+
+
 function main(){
-	clock++;
-	document.getElementById("chrono").innerHTML = "Clock: "+clock;
+	clock+=1;
+	tot_waiting += y_tot - y_left + x_tot - x_left;
 
 	var rand = Math.random();
 	
-	if (rand<0.32){ //just red
+	if (rand < (1-proby)*probx){ //just red
 		x_tot++;
 		if (x_tot-x_left > 7){
 			alert('Too much cars in x');
@@ -132,7 +192,7 @@ function main(){
 	}
 	else{
 	
-	if (rand<0.8){ //no one
+	if (rand < (1-proby)*probx + (1-proby)*(1-probx)) { //no one
 		if (green == -1){
 			if (x_tot>x_left){
 				x_left++;
@@ -147,7 +207,7 @@ function main(){
 		}
 	}
 	else{
-	if (rand<0.92){//just blue
+	if (rand < (1-proby)*probx + (1-proby)*(1-probx) + proby*(1-probx) ) {//just blue
 		y_tot++;
 		if (y_tot-y_left > 7){
 			alert('Too much cars in y');
@@ -205,6 +265,9 @@ function main(){
 	}
 	}
 	}
+	document.getElementById("chrono").innerHTML = "Clock: "+clock;
+	document.getElementById("queue").innerHTML = "Total waiting time: "+tot_waiting;
+	document.getElementById("tot_out").innerHTML = "Total out: "+(y_left+x_left);
 	setTimeout(main,1500);//maxtime animation 
 }
 
@@ -223,13 +286,15 @@ function changeLight(){
 	if (green<0){
 		document.getElementById("tfx").src = "pictures/green.png";
 		document.getElementById("tfy").src = "pictures/red.png"; 
+		var waittime = endx;
 	}
 	else{
 		document.getElementById("tfx").src = "pictures/red.png";
 		document.getElementById("tfy").src = "pictures/green.png";
+		var waittime = endy;
 	}
 
-	setTimeout(changeLight,15000);
+	setTimeout(changeLight,waittime*1.5);
 }
 
 function redcome(){
@@ -266,7 +331,7 @@ function redleave(){
 		if (c >= 17 && posy>2) {
 			posy = posy-8;  
 			elem_out.style.top = posy + "px";
-			elem_out.style.left = 502+"px"
+			elem_out.style.left = 492+"px"
 			end = false;
 		}
 		else {
