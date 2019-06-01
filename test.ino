@@ -10,20 +10,21 @@
 
 
 #define LEDTRAIN 10   // Train
-#define BUTTONT 11    // Bouton du train
-#define BUTTONP 12    // Bouton des piétons 
+#define BUTTONP 11    // Bouton des piétons 
+#define BUTTONT 12    // Bouton du train
+
 
 #define TIMEOFF 2000
-#define TIMEON 10000
-#define TIMETRAIN 2000
+#define TIMEON 7000
+#define TIMETRAIN 3000
+#define TIMEPEDESTRIAN 7000
 
 
 //#define PROBATRAIN 1000000 // at any time the proba of arrival of a train is 1/PROBATRAIN
 
 
-bool PRESSEDBUTTON = false;
+bool PRESSEDBUTTON = false; // bouton des piétons 
 int buttonState = 0;
-long randomVal = 256;
 
 
 void setup() {
@@ -38,6 +39,8 @@ void setup() {
   
   pinMode(LEDTRAIN, OUTPUT);
   pinMode(BUTTONP, INPUT);
+  pinMode(BUTTONT, INPUT);
+
   digitalWrite(PPTR,HIGH);
   digitalWrite(PTR,HIGH);
   
@@ -97,7 +100,7 @@ void off3(){
   digitalWrite(VPTR,HIGH);
   digitalWrite(VTR,HIGH);
   
-  for(int i = 0; i< 5000; ++i){
+  for(int i = 0; i< TIMEPEDESTRIAN; ++i){
     delay(1);
     if (checkButtonT()){
         trainTravel();
@@ -138,11 +141,6 @@ void switchOn(int vptr, int vtr, int vptv, int vtv){
   digitalWrite(vptr,LOW);
   
 }
-
-/*bool trainRandom(){
-  randomVal = random(0,PROBATRAIN);
-  return randomVal == 0;
-}*/
 
 
 void checkButtonP(){
