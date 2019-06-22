@@ -15,12 +15,9 @@
 
 
 #define TIMEOFF 2000
-#define TIMEON 7000
+#define TIMEON 6000
 #define TIMETRAIN 3000
 #define TIMEPEDESTRIAN 7000
-
-
-//#define PROBATRAIN 1000000 // at any time the proba of arrival of a train is 1/PROBATRAIN
 
 
 bool PRESSEDBUTTON = false; // bouton des piétons 
@@ -47,15 +44,20 @@ void setup() {
 }
 
 void loop(){
-  switchOn(VPTR,VTR,VPTV,VTV);
   off1();
-  switchOn(VTR,VPTR,VTV,VPTV);
+  switchOn(VPTR,VTR,VPTV,VTV);
   off2();
+  switchOn(VTR,VPTR,VTV,VPTV);
+  
 }
 
 
-void off2(){
-  
+void off1(){
+  /* all lights are red between the switch of cars traffic light
+    if a pedestrian asked to cross over, the pedestrian turn is activated
+  */
+
+  // all light are red
   for(int i = 0; i< TIMEOFF; ++i){
     delay(1);
     digitalWrite(PPTR,HIGH);
@@ -69,12 +71,15 @@ void off2(){
         i=0;   
     }
   }
+
+  // if a pedestrian asked to cross over
   if(PRESSEDBUTTON){
-    off3();
+    PedestrianCrossover();
   }
 }
 
-void off1(){
+void off2(){
+  /* all lights are red between the switch of cars traffic light*/
   for(int i = 0; i< TIMEOFF; ++i){
     delay(1);
     digitalWrite(PPTR,HIGH);
@@ -92,7 +97,8 @@ void off1(){
   digitalWrite(VTR,LOW);
 }
 
-void off3(){
+void PedestrianCrossover(){
+  /* pedestrian turn */
   digitalWrite(PPTR,LOW);
   digitalWrite(PTR,LOW);
   digitalWrite(PPTV,HIGH);
@@ -144,6 +150,7 @@ void switchOn(int vptr, int vtr, int vptv, int vtv){
 
 
 void checkButtonP(){
+  /*check if a pedestrian button is pressed*/
   buttonState = digitalRead(BUTTONP);
   if(buttonState == HIGH){
     PRESSEDBUTTON = true;
@@ -151,12 +158,14 @@ void checkButtonP(){
 }
 
 bool checkButtonT(){
+  /*check if the button of the train is pressed*/
   buttonState = digitalRead(BUTTONT);
   return buttonState == HIGH;
 }
 
 
 void trainTravel(){
+  /* simulate the incoming train and passing train*/
   digitalWrite(PPTR,HIGH);
   digitalWrite(PTR,HIGH);
   digitalWrite(VPTR,HIGH);
@@ -167,6 +176,7 @@ void trainTravel(){
   digitalWrite(VPTV,LOW);
   digitalWrite(VTV,LOW);
 
+  // train is coming
   for(int i = 0; i<TIMETRAIN/200; ++i){
       digitalWrite(LEDTRAIN,LOW);
       for(int j=0; j<100; j++){
@@ -179,6 +189,8 @@ void trainTravel(){
         checkButtonP();
       }
   }
+
+  // train is passing
   for(int i = 0; i<TIMETRAIN; ++i){
     delay(1);
     checkButtonP();  
